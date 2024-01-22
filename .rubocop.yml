@@ -1,5 +1,9 @@
 AllCops:
-  TargetRubyVersion: 2.6
+  TargetRubyVersion: 2.7
+
+Style/AccessModifierDeclarations
+  Enabled: true
+  EnforcedStyle: inline
 
 Style/StringLiterals:
   Enabled: true
