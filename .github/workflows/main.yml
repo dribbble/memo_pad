@@ -24,6 +24,5 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
-        bundler: none # Unsure why Bundler 2.4.22 won't install in CI for Ruby 2.7, but let's just use the built-in version of Bundler for each of our supported versions for the time being
     - name: Run the default task
       run: bundle exec rake
