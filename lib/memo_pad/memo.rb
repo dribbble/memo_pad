@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module MemoPad
+  # Hold memoized results for an instance.
   class Memo
     attr_reader :cache
 

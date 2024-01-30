@@ -41,13 +41,10 @@ class ClassWithMemoPad
   end
 end
 
-class ClassWithoutMemoPad
-end
-
 describe MemoPad do
   describe "::VERSION" do
     it "has a version number" do
-      refute_nil ::MemoPad::VERSION
+      refute_nil MemoPad::VERSION
     end
   end
 
@@ -67,8 +64,5 @@ describe MemoPad do
 
       assert_equal 1, subject.call_tracker.count(:no_arguments)
     end
-  end
-
-  def test_results_cache_with_no_arguments
   end
 end

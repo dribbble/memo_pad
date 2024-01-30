@@ -1,7 +1,12 @@
+require:
+  - rubocop-minitest
+  - rubocop-rake
+
 AllCops:
   TargetRubyVersion: 2.7
+  NewCops: enable
 
-Style/AccessModifierDeclarations
+Style/AccessModifierDeclarations:
   Enabled: true
   EnforcedStyle: inline
 
