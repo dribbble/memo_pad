@@ -6,6 +6,12 @@ AllCops:
   TargetRubyVersion: 2.7
   NewCops: enable
 
+Layout/LineLength:
+  Max: 120
+
+Metrics/BlockLength:
+  AllowedMethods: ["describe"]
+
 Style/AccessModifierDeclarations:
   Enabled: true
   EnforcedStyle: inline
@@ -17,6 +23,3 @@ Style/StringLiterals:
 Style/StringLiteralsInInterpolation:
   Enabled: true
   EnforcedStyle: double_quotes
-
-Layout/LineLength:
-  Max: 120

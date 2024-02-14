@@ -11,9 +11,22 @@ module MemoPad
       end
     end
 
-    def call(method_name, *args, &block)
-      result = cache[method_name].fetch(args, &block)
-      cache[method_name][args] = result
+    def fetch(method_name, *args, &block)
+      read!(method_name, *args)
+    rescue KeyError
+      write(method_name, *args, value: block.call)
+    end
+
+    def read(method_name, *args)
+      cache[method_name].fetch(args, nil)
+    end
+
+    def read!(method_name, *args)
+      cache[method_name].fetch(args)
+    end
+
+    def write(method_name, *args, value:)
+      cache[method_name][args] = value
     end
   end
 end
