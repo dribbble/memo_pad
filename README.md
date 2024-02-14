@@ -27,7 +27,7 @@ If bundler is not being used to manage dependencies, install the gem by executin
 ## Usage
 
 1. First, `include MemoPad` in your class.
-2. Then use `memo_pad.call(name, *args) do; end` to memoize the result of the block.
+2. Then use `memo_pad.fetch(name, *args) do; end` to memoize the result of the block.
 3. There is no step 3.
 
 ```ruby
@@ -35,30 +35,41 @@ class Foo
   include MemoPad
 
   def expensive_method
-    memo_pad.call(:expensive_method) do
+    memo_pad.fetch(:expensive_method) do
       # Do some expensive work here
     end
   end
 
   def expensive_method_with_arguments(foo, bar: nil)
-    memo_pad.call(:expensive_method, foo, bar) do
+    memo_pad.fetch(:expensive_method, foo, bar) do
       # Do expensive work here, respecting the values of `foo` and `bar`
     end
   end
 
   def complex_memoization
-    first_part = memo_pad.call(:complex_memoization_first) do
+    first_part = memo_pad.fetch(:complex_memoization_first) do
       # Some independent expensive work
     end
 
     # Maybe some other unmemoized work
 
-    memo_pad.call(:complex_memoization_second, first_part) do
+    memo_pad.fetch(:complex_memoization_second, first_part) do
       # Some other expensive work, respecting the value of `first_part`
     end
   end
 end
 ```
+
+You can directly write a memo, if needed, with `#write`. It has nearly the same signature as `#fetch`, the name and optional list of arguments, with the addition of the `value:` keyword argument to supply the value to write to the memo.
+
+```ruby
+def precache_things(things)
+  things.each do |thing|
+    memo_pad.write(:has_thing?, thing, value: true)
+  end
+end
+```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.

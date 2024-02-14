@@ -28,15 +28,27 @@ class ClassWithMemoPad
     @call_tracker = CallTracker.new
   end
 
+  def no_arguments
+    memo_pad.fetch(:no_arguments) do
+      @call_tracker.track(:no_arguments, rand)
+    end
+  end
+
   def no_arguments_truthy
-    memo_pad.call(:no_arguments) do
-      @call_tracker.track(:no_arguments, true)
+    memo_pad.fetch(:no_arguments_truthy) do
+      @call_tracker.track(:no_arguments_truthy, true)
     end
   end
 
   def no_arguments_falsey
-    memo_pad.call(:no_arguments) do
-      @call_tracker.track(:no_arguments, nil)
+    memo_pad.fetch(:no_arguments_falsey) do
+      @call_tracker.track(:no_arguments_falsey, nil)
+    end
+  end
+
+  def with_arguments(foo)
+    memo_pad.fetch(:with_arguments, foo) do
+      @call_tracker.track(:with_arguments, foo)
     end
   end
 end
@@ -48,21 +60,95 @@ describe MemoPad do
     end
   end
 
-  describe "#call" do
+  describe "#fetch" do
     subject { ClassWithMemoPad.new }
 
     it "calls the block once for methods with no arguments" do
       assert subject.no_arguments_truthy
       subject.no_arguments_truthy
 
-      assert_equal 1, subject.call_tracker.count(:no_arguments)
+      assert_equal 1, subject.call_tracker.count(:no_arguments_truthy)
     end
 
     it "caches falsey values also" do
       refute subject.no_arguments_falsey
       subject.no_arguments_falsey
 
-      assert_equal 1, subject.call_tracker.count(:no_arguments)
+      assert_equal 1, subject.call_tracker.count(:no_arguments_falsey)
+    end
+  end
+
+  describe "#write" do
+    subject { ClassWithMemoPad.new }
+    let(:result) { rand }
+
+    it "writes the given value to be read later" do
+      subject.memo_pad.write(:no_arguments, value: result)
+
+      assert_equal result, subject.memo_pad.read(:no_arguments)
+      assert_equal result, subject.no_arguments
+    end
+
+    it "writes the given value for methods with arguments" do
+      subject.memo_pad.write(:with_arguments, :foo, value: result)
+
+      assert_equal result, subject.memo_pad.read(:with_arguments, :foo)
+      assert_nil subject.memo_pad.read(:with_arguments, :bar)
+      assert_nil subject.memo_pad.read(:with_arguments)
+    end
+  end
+
+  describe "#read" do
+    subject { ClassWithMemoPad.new }
+    let(:arg) { rand }
+
+    it "returns nil if no cached value present" do
+      assert_nil subject.memo_pad.read(:no_arguments)
+    end
+
+    it "it reads a cached value if present" do
+      result = subject.no_arguments
+
+      assert_equal result, subject.memo_pad.read(:no_arguments)
+    end
+
+    it "reads a cached value for method with arguments" do
+      result = subject.with_arguments(arg)
+
+      assert_equal result, subject.memo_pad.read(:with_arguments, arg)
+      assert_nil subject.memo_pad.read(:with_arguments, :foo)
+      assert_nil subject.memo_pad.read(:with_arguments)
+    end
+  end
+
+  describe "#read!" do
+    subject { ClassWithMemoPad.new }
+    let(:arg) { rand }
+
+    it "raises KeyError if no cached value present" do
+      assert_raises(KeyError) do
+        subject.memo_pad.read!(:no_arguments)
+      end
+    end
+
+    it "it reads a cached value if present" do
+      result = subject.no_arguments
+
+      assert_equal result, subject.memo_pad.read!(:no_arguments)
+    end
+
+    it "reads a cached value for method with arguments" do
+      result = subject.with_arguments(arg)
+
+      assert_equal result, subject.memo_pad.read!(:with_arguments, arg)
+
+      assert_raises(KeyError) do
+        assert_nil subject.memo_pad.read!(:with_arguments, :foo)
+      end
+
+      assert_raises(KeyError) do
+        assert_nil subject.memo_pad.read!(:with_arguments)
+      end
     end
   end
 end
