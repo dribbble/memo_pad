@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.3.0] - 2024-02-16
+
+- Add `#clear` method to flush all cached entries on the instance.
+
 ## [0.2.0] - 2024-02-14
 
 - **BREAKING**: Changes `MemoPad::Memo#call` to `MemoPad::Memo#fetch` to more closely match interfaces like `ActiveSupport::Cache`.
