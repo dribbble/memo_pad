@@ -70,6 +70,12 @@ def precache_things(things)
 end
 ```
 
+You can also flush the whole of the cache on an instance.
+
+```ruby
+foo.memo_pad.clear
+```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
