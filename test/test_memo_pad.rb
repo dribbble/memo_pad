@@ -54,6 +54,8 @@ class ClassWithMemoPad
 end
 
 describe MemoPad do
+  subject { ClassWithMemoPad.new }
+
   describe "::VERSION" do
     it "has a version number" do
       refute_nil MemoPad::VERSION
@@ -61,8 +63,6 @@ describe MemoPad do
   end
 
   describe "#fetch" do
-    subject { ClassWithMemoPad.new }
-
     it "calls the block once for methods with no arguments" do
       assert subject.no_arguments_truthy
       subject.no_arguments_truthy
@@ -79,7 +79,6 @@ describe MemoPad do
   end
 
   describe "#write" do
-    subject { ClassWithMemoPad.new }
     let(:result) { rand }
 
     it "writes the given value to be read later" do
@@ -99,7 +98,6 @@ describe MemoPad do
   end
 
   describe "#read" do
-    subject { ClassWithMemoPad.new }
     let(:arg) { rand }
 
     it "returns nil if no cached value present" do
@@ -122,7 +120,6 @@ describe MemoPad do
   end
 
   describe "#read!" do
-    subject { ClassWithMemoPad.new }
     let(:arg) { rand }
 
     it "raises KeyError if no cached value present" do
@@ -143,12 +140,24 @@ describe MemoPad do
       assert_equal result, subject.memo_pad.read!(:with_arguments, arg)
 
       assert_raises(KeyError) do
-        assert_nil subject.memo_pad.read!(:with_arguments, :foo)
+        subject.memo_pad.read!(:with_arguments, :foo)
       end
 
       assert_raises(KeyError) do
-        assert_nil subject.memo_pad.read!(:with_arguments)
+        subject.memo_pad.read!(:with_arguments)
       end
+    end
+  end
+
+  describe "#clear" do
+    it "empties any memoized values" do
+      subject.memo_pad.write(:foo, value: "bar")
+      subject.memo_pad.write(:bar, :baz, value: "quux")
+
+      subject.memo_pad.clear
+
+      assert_nil subject.memo_pad.read(:foo)
+      assert_nil subject.memo_pad.read(:bar, :baz)
     end
   end
 end

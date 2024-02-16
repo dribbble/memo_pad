@@ -17,6 +17,10 @@ module MemoPad
       write(method_name, *args, value: block.call)
     end
 
+    def clear
+      cache.clear
+    end
+
     def read(method_name, *args)
       cache[method_name].fetch(args, nil)
     end
