@@ -46,6 +46,13 @@ class ClassWithMemoPad
     end
   end
 
+  def no_arguments_and_raise
+    memo_pad.fetch(:no_arguments_and_raise) do
+      raise StandardError, "Test that this handles something bad happening"
+      @call_tracker.track(:no_arguments_and_raise, nil) # rubocop:disable Lint/UnreachableCode
+    end
+  end
+
   def with_arguments(foo)
     memo_pad.fetch(:with_arguments, foo) do
       @call_tracker.track(:with_arguments, foo)
@@ -75,6 +82,14 @@ describe MemoPad do
       subject.no_arguments_falsey
 
       assert_equal 1, subject.call_tracker.count(:no_arguments_falsey)
+    end
+
+    it "raises any errors without caching" do
+      assert_raises(StandardError) do
+        subject.no_arguments_and_raise
+      end
+
+      assert_equal 0, subject.call_tracker.count(:no_arguments_and_raise)
     end
   end
 
