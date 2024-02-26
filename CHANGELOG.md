@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.4.0] - 2024-02-16
+
+- Add `.memo_pad` class method upon including module to call from class methods.
+
 ## [0.3.0] - 2024-02-16
 
 - Add `#clear` method to flush all cached entries on the instance.
