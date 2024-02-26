@@ -27,7 +27,7 @@ require_relative "memo_pad/memo"
 module MemoPad
   def self.included(klass)
     def klass.memo_pad
-      @@memo_pad ||= MemoPad::Memo.new
+      @memo_pad ||= MemoPad::Memo.new
     end
   end
 
