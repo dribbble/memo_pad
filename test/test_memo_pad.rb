@@ -30,32 +30,46 @@ class ClassWithMemoPad
 
   def no_arguments
     memo_pad.fetch(:no_arguments) do
-      @call_tracker.track(:no_arguments, rand)
+      call_tracker.track(:no_arguments, rand)
     end
   end
 
   def no_arguments_truthy
     memo_pad.fetch(:no_arguments_truthy) do
-      @call_tracker.track(:no_arguments_truthy, true)
+      call_tracker.track(:no_arguments_truthy, true)
     end
   end
 
   def no_arguments_falsey
     memo_pad.fetch(:no_arguments_falsey) do
-      @call_tracker.track(:no_arguments_falsey, nil)
+      call_tracker.track(:no_arguments_falsey, nil)
     end
   end
 
   def no_arguments_and_raise
     memo_pad.fetch(:no_arguments_and_raise) do
       raise StandardError, "Test that this handles something bad happening"
-      @call_tracker.track(:no_arguments_and_raise, nil) # rubocop:disable Lint/UnreachableCode
+      call_tracker.track(:no_arguments_and_raise, nil) # rubocop:disable Lint/UnreachableCode
     end
   end
 
   def with_arguments(foo)
     memo_pad.fetch(:with_arguments, foo) do
-      @call_tracker.track(:with_arguments, foo)
+      call_tracker.track(:with_arguments, foo)
+    end
+  end
+end
+
+class MemoizeClassMethods
+  include MemoPad
+
+  def self.call_tracker
+    @call_tracker ||= CallTracker.new
+  end
+
+  def self.no_arguments_class_method
+    memo_pad.fetch(:no_arguments_class_method) do
+      call_tracker.track(:no_arguments, true)
     end
   end
 end
@@ -90,6 +104,13 @@ describe MemoPad do
       end
 
       assert_equal 0, subject.call_tracker.count(:no_arguments_and_raise)
+    end
+
+    it "can be used in class methods" do
+      assert MemoizeClassMethods.no_arguments_class_method
+      MemoizeClassMethods.no_arguments_class_method
+
+      assert_equal 1, MemoizeClassMethods.call_tracker.count(:no_arguments)
     end
   end
 

@@ -25,7 +25,11 @@ require_relative "memo_pad/memo"
 #     end
 #   end
 module MemoPad
-  class Error < StandardError; end
+  def self.included(klass)
+    def klass.memo_pad
+      @memo_pad ||= MemoPad::Memo.new
+    end
+  end
 
   def memo_pad
     @memo_pad ||= MemoPad::Memo.new
