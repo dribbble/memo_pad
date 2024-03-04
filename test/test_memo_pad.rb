@@ -98,6 +98,24 @@ describe MemoPad do
       assert_equal 1, subject.call_tracker.count(:no_arguments_falsey)
     end
 
+    it "does not share cached values between instances" do
+      subject1 = ClassWithMemoPad.new
+      subject2 = ClassWithMemoPad.new
+      value1 = "foo"
+      value2 = "bar"
+
+      assert_equal value1, subject1.with_arguments(value1)
+
+      assert_equal 1, subject1.call_tracker.count(:with_arguments)
+      assert_equal 0, subject2.call_tracker.count(:with_arguments)
+
+      assert_equal value1, subject1.with_arguments(value1)
+      assert_equal value2, subject2.with_arguments(value2)
+
+      assert_equal 1, subject1.call_tracker.count(:with_arguments)
+      assert_equal 1, subject2.call_tracker.count(:with_arguments)
+    end
+
     it "raises any errors without caching" do
       assert_raises(StandardError) do
         subject.no_arguments_and_raise
